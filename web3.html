@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Formulário de Cadastro</title>
+  <!DOCTYPE html>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #015958;
+      margin: 0;
+      padding: 20px;
+      display: flex;
+      justify-content: center;
+    }
+    .container {
+      background: #008F8C;
+      padding: 30px;
+      border-radius: 14px;
+      max-width: 620px;
+      width: 100%;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+    h2 {
+      text-align: center;
+    }
+    input {
+      width: 80%;
+      padding: 14px;
+      border: 3px solid #928484;
+      border-radius: 10px;
+    }
+    button {
+      padding: 12px;
+      border: none;
+      cursor: pointer;
+      border-radius: 8px;
+    }
+    .addBtn {
+      background: #28a745;
+      color: white;
+    }
+    .editBtn {
+      background: #0177f5;
+      color: white;
+      margin-left: 5px;
+    }
+    .deleteBtn {
+      background: #ff0019;
+      color: white;
+      margin-left: 6px;
+    }
+    ul {
+      list-style: none;
+      padding: 0;
+      margin-top: 23px;
+    }
+    li {
+      background: #ffffff;
+      padding: 12px;
+      margin-bottom: 13px;
+      border-radius: 9px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .feedback {
+      margin-top: 12px;
+      text-align: center;
+      font-weight: bold;
+      color: rgb(0, 255, 0);
+    }
+
+    /*responsividae mobile*/
+    @media (max-width: 480px) {
+      body {
+        padding: 10px;
+      }
+
+      .container {
+        padding: 20px;
+        border-radius: 10px;
+      }
+
+      h2 {
+        font-size: 20px;
+      }
+
+      input {
+        width: 100%; /* ocupa toda a tela no celular */
+        font-size: 14px;
+      }
+
+      button {
+        width: 100%; /* botões ocupam toda a largura */
+        margin-top: 8px;
+        font-size: 14px;
+        padding: 14px;
+      }
+
+      li {
+        flex-direction: column; /* itens ficam em coluna */
+        align-items: flex-start;
+      }
+
+      li div {
+        margin-top: 10px;
+        width: 100%;
+        display: flex;
+        gap: 8px;
+      }
+
+      .editBtn, .deleteBtn {
+        flex: 1; /* divide o espaço dos botões */
+      }
+    }
+
+     nav {
+      display: flex; /* Links lado a lado */
+      align-items: center;
+      gap: 20px; /* Espaço entre os links */
+    }
+
+    nav a {
+      text-decoration: none; /* Remove o sublinhado */
+      color: white; /* Texto branco */
+      font-weight: bold;
+      font-size: 16px;
+      padding: 8px 14px;
+      border-radius: 5px;
+      transition: 0.3s; /* Animação suave */
+    }
+
+    nav a:hover {
+      background: yellow; /* Fundo amarelo ao passar o mouse */
+      color: black; /* Texto preto no hover */
+    }
+
+      .avatar {
+      width: 45px;
+      height: 45px;
+      border-radius: 50%; /* Deixa a foto redonda */
+      border: 2px solid yellow; /* Borda amarela */
+      object-fit: cover; /* Ajusta a imagem dentro do espaço */
+      cursor: pointer; /* Muda o cursor ao passar em cima */
+    }
+  
+  </style>
+
+</head>
+<body>
+  <div class="container">
+    <h2>LISTA DE TAREFAS</h2>
+    <input type="text" id="itemInput" placeholder="Digite uma tarefa...">
+    <button class="addBtn" onclick="adicionarItem()">Adicionar</button>
+    <p id="feedback" class="feedback"></p>
+    <ul id="lista"></ul>
+  </div>
+
+  <script>
+    let itens = [];
+
+    // Carregar dados ao iniciar
+    window.onload = function() {
+      carregarLocalStorage();
+      listarItens();
+    }
+
+    // Função para salvar no localStorage
+    function salvarLocalStorage() {
+      localStorage.setItem("itens", JSON.stringify(itens));
+    }
+
+    // Função para carregar do localStorage
+    function carregarLocalStorage() {
+      let dados = localStorage.getItem("itens");
+      if (dados) {
+        itens = JSON.parse(dados);
+      }
+    }
+
+    // Função para listar itens na tela
+    function listarItens() {
+      let lista = document.getElementById("lista");
+      lista.innerHTML = "";
+      itens.forEach((item, index) => {
+        let li = document.createElement("li");
+        li.innerHTML = `
+          <span>${item}</span>
+          <div>
+            <button class="editBtn" onclick="editarItem(${index})">Editar</button>
+            <button class="deleteBtn" onclick="removerItem(${index})">Excluir</button>
+          </div>
+        `;
+        lista.appendChild(li);
+      });
+    }
+
+    // Função para adicionar item
+    function adicionarItem() {
+      let input = document.getElementById("itemInput");
+      let valor = input.value.trim();
+
+      if (valor === "") {
+        mostrarFeedback("⚠️ Digite um item válido!", "red");
+        return;
+      }
+      if (itens.includes(valor)) {
+        mostrarFeedback("⚠️ Esse item já existe!", "red");
+        return;
+      }
+
+      itens.push(valor);
+      salvarLocalStorage();
+      listarItens();
+      mostrarFeedback("✅ Item adicionado com sucesso!");
+      input.value = "";
+    }
+
+    // Função para remover item
+    function removerItem(index) {
+      itens.splice(index, 1);
+      salvarLocalStorage();
+      listarItens();
+      mostrarFeedback("Item removido!");
+    }
+
+    // Função para editar item
+    function editarItem(index) {
+      let novoValor = prompt("Edite o item:", itens[index]);
+      if (novoValor !== null && novoValor.trim() !== "") {
+        itens[index] = novoValor.trim();
+        salvarLocalStorage();
+        listarItens();
+        mostrarFeedback("Item editado com sucesso!");
+      }
+    }
+
+    // Função para mostrar feedback
+    function mostrarFeedback(msg, cor = "green") {
+      let feedback = document.getElementById("feedback");
+      feedback.style.color = cor;
+      feedback.textContent = msg;
+      setTimeout(() => { feedback.textContent = ""; }, 2000);
+    }
+  
+  </script>
+  <nav>
+     <a href="web2.html"><i class="site web 2"></i> web2</a>
+     <a href="web.html"><i class="site web 1"></i> web1</a>
+  </nav>
+</body>
+</html>
